@@ -4,15 +4,26 @@ import numpy as np
 import os
 import json
 
-model = SentenceTransformer(
-    'all-MiniLM-L6-v2'
-)
+model = None
 
 dimension = 384
 
 INDEX_PATH = "vector_data/faiss_index.bin"
 
 METADATA_PATH = "vector_data/chunks.json"
+
+
+def get_model():
+
+    global model
+
+    if model is None:
+
+        model = SentenceTransformer(
+            "all-MiniLM-L6-v2"
+        )
+
+    return model
 
 
 # LOAD EXISTING INDEX
@@ -50,7 +61,7 @@ def store_chunks(chunks, file_name="unknown"):
 
     global chunks_store
 
-    embeddings = model.encode(chunks)
+    embeddings = get_model().encode(chunks)
 
     embeddings = np.array(
         embeddings
@@ -74,7 +85,7 @@ def search_chunks(query, top_k=3):
 
         return []
 
-    query_embedding = model.encode([query])
+    query_embedding = get_model().encode([query])
 
     query_embedding = np.array(
         query_embedding
