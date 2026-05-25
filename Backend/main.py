@@ -10,6 +10,7 @@ import shutil
 import zipfile
 import os
 from repository.indexer import index_repository
+from agent_task import run_agent_task
 
 app = FastAPI()
 
@@ -24,6 +25,9 @@ app.add_middleware(
 class CodeInput(BaseModel):
     code: str
     language: str
+
+class AgentTaskInput(BaseModel):
+    prompt: str
 
 @app.get("/")
 def home():
@@ -76,6 +80,16 @@ def fix_code(data: CodeInput):
         "validation_output": validation_result["stdout"],
 
         "validation_error": validation_result["stderr"]
+    }
+
+@app.post("/agent-task")
+
+def agent_task(data: AgentTaskInput):
+
+    result = run_agent_task(data.prompt)
+
+    return {
+        "result": result
     }
 
 @app.post("/upload")

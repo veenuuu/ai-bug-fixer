@@ -1,6 +1,6 @@
 from repository.indexer import index_repository
 
-from embeddings.VectorStore import search_chunks
+from embeddings.vector_store import search_chunks
 
 
 result = index_repository(

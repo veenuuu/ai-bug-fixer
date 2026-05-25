@@ -6,6 +6,7 @@ import UploadSection from "./components/UploadSection";
 import ResultSection from "./components/ResultSection";
 import ValidationSection from "./components/ValidationSection";
 import CodeDiffViewer from "./components/CodeDiffViewer";
+import AIRepoAgent from "./components/AIRepoAgent";
 import useBugFixer from "./hooks/useBugFixer";
 
 function App() {
@@ -27,6 +28,11 @@ function App() {
     fixBug,
     uploadFile,
     uploadRepository,
+    agentPrompt,
+    agentResponse,
+    agentLoading,
+    runAgentTask,
+    setAgentPrompt
   } = useBugFixer();
 
   const [selectedFile, setSelectedFile] = useState(null);
@@ -79,6 +85,14 @@ function App() {
               repoUploadMessage={repoUploadMessage}
               repoLoading={repoLoading}
               uploadRepository={uploadRepository}
+            />
+
+            <AIRepoAgent
+              agentPrompt={agentPrompt}
+              setAgentPrompt={setAgentPrompt}
+              runAgentTask={runAgentTask}
+              agentLoading={agentLoading}
+              agentResponse={agentResponse}
             />
 
             <CodeEditor code={code} setCode={setCode} language={language} />

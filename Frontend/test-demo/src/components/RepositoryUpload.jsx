@@ -21,7 +21,9 @@ function RepositoryUpload({
       {repoUploadMessage && (
         <div className="mt-4 bg-purple-900 border border-purple-500 p-4 rounded-xl text-center">
           <h3 className="text-xl font-bold text-purple-300">
-            {repoLoading ? "Indexing Repository..." : repoUploadMessage}
+            {repoLoading
+              ? "Preparing AI repository analysis..."
+              : "Repository uploaded successfully 🚀"}
           </h3>
         </div>
       )}

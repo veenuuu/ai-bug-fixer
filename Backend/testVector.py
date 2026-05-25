@@ -1,4 +1,4 @@
-from embeddings.VectorStore import (
+from embeddings.vector_store import (
     store_chunks,
     search_chunks
 )

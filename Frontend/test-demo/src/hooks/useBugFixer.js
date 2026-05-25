@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { fixBugAPI, uploadFileAPI, uploadRepositoryAPI } from "../services/api";
+import { fixBugAPI, uploadFileAPI, uploadRepositoryAPI, runAgentTaskAPI } from "../services/api";
 
 const useBugFixer = () => {
   const [code, setCode] = useState("");
@@ -26,6 +26,12 @@ const useBugFixer = () => {
   const [repoUploadMessage, setRepoUploadMessage] = useState("");
 
   const [repoLoading, setRepoLoading] = useState(false);
+
+  const [agentPrompt, setAgentPrompt] = useState(""); 
+
+  const [agentResponse, setAgentResponse] = useState("");
+
+  const [agentLoading, setAgentLoading] = useState(false);
 
   const fixBug = async () => {
     setRuntimeError("");
@@ -117,6 +123,20 @@ const useBugFixer = () => {
     setRepoLoading(false);
   };
 
+  const runAgentTask = async () => {
+    if (!agentPrompt) return;
+    setAgentLoading(true);
+    setAgentResponse("");
+
+    try{
+      const response = await runAgentTaskAPI({prompt: agentPrompt});
+      setAgentResponse(response.data.result);
+    }
+    catch(error){
+      console.log(error);
+    }
+    setAgentLoading(false);
+  }
   return {
     code,
     setCode,
@@ -135,6 +155,11 @@ const useBugFixer = () => {
     fixBug,
     uploadFile,
     uploadRepository,
+    agentPrompt,
+    agentResponse,
+    agentLoading,
+    runAgentTask,
+    setAgentPrompt
   };
 };
 
