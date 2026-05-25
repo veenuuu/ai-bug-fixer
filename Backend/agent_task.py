@@ -1,10 +1,8 @@
 from embeddings.vector_store import search_chunks
-
 from openai import OpenAI
-
 from dotenv import load_dotenv
-
 import os
+import json
 
 load_dotenv()
 
@@ -16,7 +14,10 @@ client = OpenAI(
 
 def run_agent_task(prompt):
 
-    retrieved_chunks = search_chunks(prompt)
+    retrieved_chunks = search_chunks(
+        prompt,
+        top_k=10
+    )
 
     context = "\n\n".join([
         chunk["chunk"]
@@ -24,22 +25,35 @@ def run_agent_task(prompt):
     ])
 
     full_prompt = f"""
-You are an AI coding agent.
+You are an expert AI software engineer.
 
 A user uploaded a repository.
 
 USER TASK:
 {prompt}
 
-RELEVANT REPOSITORY CONTEXT:
+REPOSITORY CONTEXT:
 {context}
 
-Analyze the issue carefully.
+Your task:
+1. Identify the most relevant file
+2. Fix the issue
+3. Return response ONLY in valid JSON format
 
-Explain:
-1. What the issue is
-2. Which file/function is likely involved
-3. Suggested fix
+Example response:
+
+{{
+  "file": "auth.py",
+  "fixed_code": "full corrected code"
+}}
+
+IMPORTANT:
+- file must be an ACTUAL file from repository context
+- never invent filenames
+- Return ONLY JSON
+- No markdown
+- No explanations
+- fixed_code must contain complete corrected code
 """
 
     response = client.chat.completions.create(
@@ -55,4 +69,8 @@ Explain:
 
     )
 
-    return response.choices[0].message.content
+    content = response.choices[0].message.content
+
+    print(content)
+
+    return json.loads(content)

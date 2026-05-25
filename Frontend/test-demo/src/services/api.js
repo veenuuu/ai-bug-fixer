@@ -20,6 +20,6 @@ export const uploadRepositoryAPI = (formData) =>
     },
   });
 
-export const runAgentTaskAPI = (data) => API.post("/agent-task", data);
+export const runAgentTaskAPI = (data, config) => API.post("/agent-task", data, config);
 
 export default API;

@@ -128,15 +128,38 @@ const useBugFixer = () => {
     setAgentLoading(true);
     setAgentResponse("");
 
-    try{
-      const response = await runAgentTaskAPI({prompt: agentPrompt});
-      setAgentResponse(response.data.result);
-    }
-    catch(error){
+    try {
+      const response = await runAgentTaskAPI(
+        {
+          prompt: agentPrompt,
+        },
+        {
+          responseType: "blob",
+        },
+      );
+
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+
+      const link = document.createElement("a");
+
+      link.href = url;
+
+      link.setAttribute("download", "fixed_repository.zip");
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      setAgentResponse("Repository fixed successfully 🚀");
+    } catch (error) {
       console.log(error);
+
+      setAgentResponse("Failed to fix repository");
     }
+
     setAgentLoading(false);
-  }
+  };
+
   return {
     code,
     setCode,

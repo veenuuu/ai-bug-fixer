@@ -11,6 +11,15 @@ import zipfile
 import os
 from repository.indexer import index_repository
 from agent_task import run_agent_task
+from file_writer import save_fixed_file
+from repository.zipper import create_fixed_zip
+from fastapi.responses import FileResponse
+from repository.repo_state import (
+    save_current_repo_path,
+    get_current_repo_path
+)
+
+CURRENT_REPO_PATH = ""
 
 app = FastAPI()
 
@@ -86,7 +95,23 @@ def fix_code(data: CodeInput):
 
 def agent_task(data: AgentTaskInput):
 
-    result = run_agent_task(data.prompt)
+    result = run_agent_task(
+    data.prompt
+    )
+
+    save_fixed_file(
+    CURRENT_REPO_PATH,
+    result["file"],
+    result["fixed_code"]
+    )
+
+    zip_path = create_fixed_zip(CURRENT_REPO_PATH)
+
+    return FileResponse(
+    zip_path,
+    media_type="application/zip",
+    filename="fixed_repository.zip"
+    )
 
     return {
         "result": result
@@ -112,7 +137,6 @@ async def upload_file(file: UploadFile = File(...)):
     }
 
 @app.post("/upload-repository")
-
 def upload_repository(file: UploadFile = File(...)):
 
     upload_path = f"uploads/{file.filename}"
@@ -128,6 +152,25 @@ def upload_repository(file: UploadFile = File(...)):
     with zipfile.ZipFile(upload_path, 'r') as zip_ref:
 
         zip_ref.extractall(extract_path)
+
+    items = os.listdir(extract_path)
+
+    if len(items) == 1:
+
+        possible_inner = os.path.join(
+            extract_path,
+            items[0]
+        )
+
+        if os.path.isdir(possible_inner):
+
+            extract_path = possible_inner
+
+    print("FINAL REPO PATH:", extract_path)
+
+    save_current_repo_path(
+        extract_path
+    )
 
     result = index_repository(extract_path)
 
